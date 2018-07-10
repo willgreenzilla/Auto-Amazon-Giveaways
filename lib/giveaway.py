@@ -146,14 +146,14 @@ class GiveAwayBot(object):
 
     async def iterate_page(self, ga_page):
         next_page = await ga_page.xpath("//li[@class='a-last']")
-        next_page_href = await ga_page.evaluate(
-                '(next_page) => next_page.href',
-                next_page
-        )
         if next_page:
+            next_page_href = await ga_page.evaluate(
+                '(next_page) => next_page.firstChild.href',
+                next_page[0]
+            )
             msg = Fore.LIGHTGREEN_EX + Style.BRIGHT + "**** Moving to next giveaway page... ****"
-            print(msg)
-            return await self.browser.navigate(next_page_href)
+            await ga_page.goto(next_page_href)
+            return ga_page
         else:
             msg = Fore.LIGHTRED_EX + Style.BRIGHT + "**** Could not find Next Page for GiveAways, Exiting... ****"
             print(msg)
