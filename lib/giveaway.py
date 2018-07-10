@@ -81,6 +81,8 @@ class GiveAwayBot(object):
     async def check_for_entered(self, prize_page):
         #await prize_page.waitForSelector('.qa-giveaway-result-text')
         ga_result_element = await prize_page.querySelector('.qa-giveaway-result-text')
+        airy = await prize_page.querySelector('#airy-container')
+        play_airy = await prize_page.querySelector('.airy-play-toggle-hint')        
         if ga_result_element:
             ga_result = await prize_page.evaluate(
                 '(ga_result_element) => ga_result_element.textContent',
@@ -90,6 +92,10 @@ class GiveAwayBot(object):
                 msg = Fore.MAGENTA + Style.BRIGHT + "    **** Already entered giveaway and you didn't win. ****"
                 print(msg)
             return True
+        elif airy:
+            msg = Fore.MAGENTA + Style.BRIGHT + "    **** Stupid Amazon Video, skipping. ****"
+            print(msg)            
+            return True                        
         else:
             return False
     
@@ -112,7 +118,7 @@ class GiveAwayBot(object):
 
     async def no_req_giveaways(self):
         for prize in self.ga_prizes:
-            if 'No entry requirement' in self.ga_prizes[prize]['Requirement'] and self.ga_prizes[prize]['Entered'] is False:
+            if ' ' in self.ga_prizes[prize]['Requirement'] and self.ga_prizes[prize]['Entered'] is False and 'Follow' not in self.ga_prizes[prize]['Requirement']:
                 self.display_ga_process(self.ga_prizes[prize]['Name'])
                 prize_page = await self.browser.newPage()
                 await prize_page.setViewport({'width': 1900, 'height': 1000})
@@ -124,17 +130,40 @@ class GiveAwayBot(object):
                     await asyncio.sleep(numpy.random.choice(RANDOM_VAL))
                     prize_box = await prize_page.querySelector('#box_click_target')
                     enter_button = await prize_page.querySelector('#enterSubmitForm')
+                    enter_video = await prize_page.querySelector('#videoSubmitForm')
+                    video_text = await prize_page.querySelector('#giveaway-youtube-video-watch-text')
+                    book = await prize_page.querySelector('#submitForm')
                     if prize_box:
+                        await asyncio.sleep(numpy.random.choice(RANDOM_VAL))
                         await prize_box.click()
+                        msg = Fore.MAGENTA + Style.BRIGHT + "    **** I should have clicked the prize box?. ****"
+                        print(msg)  
                     elif enter_button:
                         await enter_button.click()
+                    elif book:
+                        await book.click()                        
+                    elif video_text:
+                        msg = Fore.MAGENTA + Style.BRIGHT + "    **** Waiting 30 seconds. ****"
+                        print(msg)
+                        await asyncio.sleep(32)
+                        msg2 = Fore.MAGENTA + Style.BRIGHT + "    **** 30 Seconds is over, Entering Contest. ****"
+                        print(msg2)                        
+                        await enter_video.click()                      
+                    else:
+                        await asyncio.sleep(1)
+                        await prize_page.close()
+                        msg = Fore.MAGENTA + Style.BRIGHT + "    **** Timed out :: Close page. ****"
+                        print(msg)
                     await asyncio.sleep(numpy.random.choice(RANDOM_VAL))
                     await self.display_ga_result(prize_page)
-                    await prize_page.close()
+                    await asyncio.sleep(1)
+                    await prize_page.close()                        
                 else:
+                    msg = Fore.MAGENTA + Style.BRIGHT + "    **** Not sure what happen, Or there's nothing to do :: skipping. ****"
+                    print(msg)
+                    await asyncio.sleep(1)                     
                     await prize_page.close()
-            print()
-
+                    
     async def check_for_last_page(self, ga_page):
         last_page = await ga_page.xpath("//li[@class='a-disabled a-last']")
         if last_page:
