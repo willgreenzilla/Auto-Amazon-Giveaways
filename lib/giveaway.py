@@ -10,16 +10,18 @@ from colorama import init, Fore, Back, Style
 
 init(autoreset=True)
 RANDOM_VAL = [7, 3, 2, 5, 10, 9, 6]
+RANDOM_PAGE = list(range(0, 100))
 
 class GiveAwayBot(object):
     def __init__(self):
         self.email = None
         self.password = None
         self.browser = None
+        self.pages = None
         self.ga_prizes = {}
 
     async def _nav_to_ga(self, login_page):
-        await login_page.goto('https://www.amazon.com/ga/giveaways')
+        await login_page.goto('https://www.amazon.com/ga/giveaways?pageId=' + str(numpy.random.choice(RANDOM_PAGE)))
         return login_page
 
     async def login(self, init=True):
