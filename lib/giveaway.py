@@ -8,16 +8,22 @@ from pyppeteer import launch
 from lib.prize import GiveAwayPrize
 from colorama import init, Fore, Back, Style
 
+with open('lib\creds.json') as data_file:
+    data = json.load(data_file)
+
+amazon_user = data['username']
+amazon_pwd = data['password']
+amazon_pages = data['give_page_count']
+
 init(autoreset=True)
 RANDOM_VAL = [7, 3, 2, 5, 10, 9, 6]
-RANDOM_PAGE = list(range(0, 100))
+RANDOM_PAGE = list(range(0, amazon_pages))
 
 class GiveAwayBot(object):
     def __init__(self):
         self.email = None
         self.password = None
         self.browser = None
-        self.pages = None
         self.ga_prizes = {}
 
     async def _nav_to_ga(self, login_page):
@@ -46,8 +52,9 @@ class GiveAwayBot(object):
         if init:
             email_msg = 'Enter your Amazon email address: '
             pass_msg = 'Enter your Amazon password: '
-            self.email = input(email_msg)
-            self.password = getpass.getpass(pass_msg)
+            self.email = amazon_user
+            self.password = amazon_pwd
+
         self.browser = await get_browser()
         login_page = await self.browser.newPage()
         await login_page.setViewport({'width': 1900, 'height': 1000})
