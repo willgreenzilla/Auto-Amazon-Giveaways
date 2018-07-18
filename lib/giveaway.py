@@ -1,6 +1,6 @@
 import asyncio
-import getpass
-import logging
+#import getpass
+#import logging
 import json
 import re
 import numpy
@@ -8,16 +8,15 @@ from pyppeteer import launch
 from lib.prize import GiveAwayPrize
 from colorama import init, Fore, Back, Style
 
-with open('lib\creds.json') as data_file:
+with open('lib\creds.json', 'r') as data_file:
     data = json.load(data_file)
 
 amazon_user = data['username']
 amazon_pwd = data['password']
-amazon_pages = data['give_page_count']
+amazon_page_counter = data['page_counter']
 
 init(autoreset=True)
 RANDOM_VAL = [7, 3, 2, 5, 10, 9, 6]
-RANDOM_PAGE = list(range(0, amazon_pages))
 
 class GiveAwayBot(object):
     def __init__(self):
@@ -27,7 +26,15 @@ class GiveAwayBot(object):
         self.ga_prizes = {}
 
     async def _nav_to_ga(self, login_page):
-        await login_page.goto('https://www.amazon.com/ga/giveaways?pageId=' + str(numpy.random.choice(RANDOM_PAGE)))
+
+        with open('lib\creds.json', 'r+') as write_file:
+            counter_data = json.load(write_file)
+            counter_data['page_counter'] = amazon_page_counter + 1
+            write_file.seek(0)
+            json.dump(counter_data, write_file, indent=4)
+            write_file.truncate()
+
+        await login_page.goto('https://www.amazon.com/ga/giveaways?pageId=' + str(amazon_page_counter))
         return login_page
 
     async def login(self, init=True):
@@ -50,8 +57,6 @@ class GiveAwayBot(object):
         login_msg = Fore.LIGHTYELLOW_EX + 'Log into Amazon...'
         print(login_msg)
         if init:
-            email_msg = 'Enter your Amazon email address: '
-            pass_msg = 'Enter your Amazon password: '
             self.email = amazon_user
             self.password = amazon_pwd
 

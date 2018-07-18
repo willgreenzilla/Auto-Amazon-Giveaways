@@ -1,6 +1,6 @@
 # Auto-Amazon-Giveaways
 
-This was forked from sniffingpickles whom forked from zdrouse and then modified a little.
+This was forked from sniffingpickles whom forked from zdrouse and then modified a little by myself.
 
 ## Install
 [Python 3.6.x](https://www.python.org/downloads/) must be installed.
@@ -19,7 +19,7 @@ Rename the EDIT_ME_creds.json file (in the lib dir) to creds.json and edit the c
 
 - Change amazonemail@address.com to your Amazon account email address.
 - Change amazonpassword to your Amazon account password.
-- Change numberofpages to the NUMBER of total giveaway pages. This is located at the bottom of https://www.amazon.com/ga/giveaways and will be displayed as something like [1][2][3] ... [135][Next]. 135 would be the total page count so enter this number.
+- Change page_counter value to the page you wish to begin on if not the first page... This will increment as it runs and give the script a place to begin when it crashes and auto re-launches (via the loop.py).
 
 Navigate into the Auto-Amazon-Giveaways directory via command prompt and type:
 
